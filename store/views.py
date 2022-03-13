@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework import status
 from rest_framework.response import Response
 from .models import Collection, Product
@@ -63,15 +64,15 @@ class CollectionDetail(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class CollectionList(APIView):
-    def get(self, request):
-        collections = Collection.objects.all()
-        serializer = CollectionSerializer(
-            collections, many=True, context={'request': request})
-        return Response(serializer.data)
+class CollectionList(ListCreateAPIView):
+    # def get_queryset(self):
+    #     return Collection.objects.all()
+    queryset = Collection.objects.all()
 
-    def post(self, request):
-        deserializer = CollectionSerializer(data=request.data)
-        deserializer.is_valid(raise_exception=True)
-        print(deserializer.data)
-        return Response('Ok')
+    # def get_serializer_class(self):
+    #     return CollectionSerializer
+
+    serializer_class = CollectionSerializer
+
+    def get_serializer_context(self):
+        return {'request': self.request}
