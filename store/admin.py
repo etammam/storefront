@@ -27,7 +27,7 @@ class CollectionAdmin(admin.ModelAdmin):
         return format_html('<a href="{}">{}</a>', url, collection.product_count)
 
     def get_queryset(self, request):
-        return super().get_queryset(request).annotate(product_count=Count('product'))
+        return super().get_queryset(request).annotate(product_count=Count('products'))
 
 
 @admin.register(models.Customer)
@@ -66,7 +66,8 @@ class ProductAdmin(admin.ModelAdmin):
     prepopulated_fields = {
         'slug': ['title']
     }
-    list_display = ['title', 'collection', 'inventory_status', 'price', 'inventory']
+    list_display = ['title', 'collection',
+                    'inventory_status', 'price', 'inventory']
     list_editable = ['price', 'inventory']
     list_per_page = 10
     list_filter = ['collection', 'last_update', InventoryFilter]
@@ -83,7 +84,8 @@ class ProductAdmin(admin.ModelAdmin):
     @admin.action(description='Clear inventory')
     def clear_inventory(self, request, queryset: QuerySet):
         updated_count = queryset.update(inventory=0)
-        self.message_user(request, f'{updated_count} products has been updated.')
+        self.message_user(
+            request, f'{updated_count} products has been updated.')
 
 
 class OrderItemInline(admin.TabularInline):
@@ -96,7 +98,8 @@ class OrderItemInline(admin.TabularInline):
 
 @admin.register(models.Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ['id', 'placed_at', 'payment_status', 'customer', 'customer_email', 'order_item_count']
+    list_display = ['id', 'placed_at', 'payment_status',
+                    'customer', 'customer_email', 'order_item_count']
     list_select_related = ['customer']
     autocomplete_fields = ['customer']
     inlines = [OrderItemInline]
